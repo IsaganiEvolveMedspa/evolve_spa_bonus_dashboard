@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Header({ mode, userLabel, onLogout }) {
+export default function Header({ mode, userLabel, onLogout, onExportPDF }) {
   return (
     <div className="header">
       <div>
@@ -11,7 +11,7 @@ export default function Header({ mode, userLabel, onLogout }) {
       </div>
       <div className="right">
         <span style={{ fontSize: '13px', color: '#d1d5db' }}>{userLabel}</span>
-        <button type="button" className="export-btn" onClick={() => window.print()}>
+        <button type="button" className="export-btn" onClick={onExportPDF}>
           Export PDF
         </button>
         <a onClick={onLogout}>Sign out</a>

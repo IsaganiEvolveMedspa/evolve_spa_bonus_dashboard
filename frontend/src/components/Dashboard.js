@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useCallback } from 'react';
+import html2pdf from 'html2pdf.js';
 import { DATA, PERF, FFS_FEES } from '../utils/data';
 import Header from './Header';
 import Toolbar from './Toolbar';
@@ -69,9 +70,28 @@ export default function Dashboard({
     return 'Admin';
   }, [mode, mbsRows, employeeId]);
 
+  const contentRef = useRef(null);
+
+  const handleExportPDF = useCallback(() => {
+    const element = contentRef.current;
+    if (!element) return;
+    const empLabel = mode === 'employee' ? userLabel : 'All Employees';
+    const filename = `Bonus_Dashboard_${empLabel.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    const opt = {
+      margin: [0.3, 0.3, 0.3, 0.3],
+      filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    };
+    html2pdf().set(opt).from(element).save();
+  }, [mode, userLabel]);
+
   return (
     <div>
-      <Header mode={mode} userLabel={userLabel} onLogout={onLogout} />
+      <Header mode={mode} userLabel={userLabel} onLogout={onLogout} onExportPDF={handleExportPDF} />
+      <div ref={contentRef}>
       {activeTab !== 'schedule' && (
         <Toolbar
           mode={mode}
@@ -133,6 +153,7 @@ export default function Dashboard({
           />
         )}
         {activeTab === 'schedule' && <ScheduleTab />}
+      </div>
       </div>
     </div>
   );
